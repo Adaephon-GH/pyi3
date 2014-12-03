@@ -1,18 +1,20 @@
 #!/usr/bin/env python3
 
+__author__ = 'Adaephon'
+
 import socket
 import struct
 import subprocess
 
 msgTypes = [
-    'COMMAND',
-    'WORKSPACES',
-    'SUBSCRIBE',
-    'OUTPUTS',
-    'TREE',
-    'MARKS',
-    'BAR_CONFIG',
-    'VERSION',
+    'command',
+    'get_workspaces',
+    'subscribe',
+    'get_outputs',
+    'get_tree',
+    'get_marks',
+    'get_bar_config',
+    'get_version',
 ]
 msgTypesMap = {msgTypes[i]: i for i in range(len(msgTypes))}
 
@@ -42,9 +44,6 @@ class Socket:
         self.socket.settimeout(1)
         self.socket.connect(socketPath)
 
-    def message(self, msgType, payload):
-        len(payload)
-
     def _send(self, msgType, msg):
         message = (struct.pack(self.headerPacking, self.magicString,
                                len(msg), msgType) + msg)
@@ -56,5 +55,14 @@ class Socket:
         data = self.socket.recv(msgSize)
         return msgType, data
 
+    def __getattr__(self, attr):
+        if attr in msgTypes:
+            def func(self, msg):
+                self._send(attr, msg)
+                return self._receive()
+            return func
+        else:
+            raise AttributeError("'{}' object has no attribute '{}'".format(
+                self.__class__.__name__, attr))
 
 
