@@ -57,8 +57,8 @@ class Socket:
 
     def __getattr__(self, attr):
         if attr in msgTypes:
-            def func(self, msg):
-                self._send(attr, msg)
+            def func(msg):
+                self._send(msgTypesMap[attr], msg)
                 return self._receive()
             return func
         else:
