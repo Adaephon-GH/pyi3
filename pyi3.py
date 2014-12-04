@@ -44,7 +44,7 @@ class Socket:
         self.socket.settimeout(1)
         self.socket.connect(socketPath)
 
-    def _send(self, msgType, msg):
+    def _send(self, msgType, msg=b''):
         message = (struct.pack(self.headerPacking, self.magicString,
                                len(msg), msgType) + msg)
         self.socket.sendall(message)
@@ -57,7 +57,7 @@ class Socket:
 
     def __getattr__(self, attr):
         if attr in msgTypes:
-            def func(msg):
+            def func(msg=b''):
                 self._send(msgTypesMap[attr], msg)
                 return self._receive()
             return func
