@@ -2,6 +2,7 @@
 
 __author__ = 'Adaephon'
 
+import json
 import socket
 import struct
 import subprocess
@@ -54,6 +55,16 @@ class Socket:
         _, msgSize, msgType = struct.unpack(self.headerPacking, header)
         data = self.socket.recv(msgSize)
         return msgType, data
+
+    def receive(self):
+        msgType, data = self._receive()
+        isEvent = msgType >> 31
+        parsedData = json.loads(data.decode())
+        response = {'Origin': 'Event' if isEvent else 'Reply',
+                    'Type': eventTypes[msgType & 0x7f] if isEvent
+                    else msgTypes[msgType],
+                    'Payload': parsedData}
+        return response
 
     def __getattr__(self, attr):
         if attr in msgTypes:
