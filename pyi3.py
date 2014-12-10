@@ -76,3 +76,20 @@ class Socket:
                 self.__class__.__name__, attr))
 
 
+class Subscription:
+    def __init__(self, socket=None):
+        self.hooks = [[]] * len(eventTypes)
+        self.socket = socket or Socket()
+
+    def register(self, hook):
+        self.hooks[eventTypesMap[hook.event]].append(hook)
+
+    def initialize(self):
+        pass
+        self.socket.subscribe()
+
+
+
+class Hook:
+    def __init__(self, event, change=None, callback=None):
+        pass
