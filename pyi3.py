@@ -29,21 +29,20 @@ eventTypes = [
 eventTypesMap = {eventTypes[i]: i for i in range(len(eventTypes))}
 
 
-def get_socketpath():
-    sp = subprocess.check_output(['i3', '--get-socketpath']).rstrip()
-    return sp
-
-
 class Socket:
     magicString = b'i3-ipc'
     headerPacking = bytes('={}sLL'.format(len(magicString)), 'utf-8')
     headerLen = struct.calcsize(headerPacking)
 
+    @staticmethod
+    def get_path():
+        path = subprocess.check_output(['i3', '--get-socketpath']).rstrip()
+        return path
 
-    def __init__(self, socketPath):
+    def __init__(self, socketPath=None):
         self.socket = socket.socket(socket.AF_UNIX, socket.SOCK_STREAM)
         self.socket.settimeout(1)
-        self.socket.connect(socketPath)
+        self.socket.connect(socketPath or self.get_path())
 
     def _send(self, msgType, msg=b''):
         message = (struct.pack(self.headerPacking, self.magicString,
