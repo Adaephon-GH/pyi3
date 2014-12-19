@@ -1,4 +1,6 @@
 #!/usr/bin/env python3
+import threading
+
 
 __author__ = 'Adaephon'
 
@@ -84,23 +86,28 @@ class EventHandler:
         self.events = [0] * len(eventTypes)
         self._eventqueue = queue.Queue()
         self._subscript_confirmation = queue.Queue()
+        self.isrunning = threading.Event()
 
     def run(self):
-        self.isrunning = True
+        self.isrunning.set()
+        handler = threading.Thread(target=self._handle_events)
+        reader = threading.Thread(target=self._read_socket)
 
     def _read_socket(self):
-        while True:
+        while self.isrunning.is_set():
             dataType, name, payload = self.socket.receive()
             if dataType == 'event':
                 self._eventqueue.put((name, payload))
-            else if name == 'subcribe':
+            elif name == 'subcribe':
                 self._subscript_confirmation.put(payload)
             else:
                 raise UnexpectedDataError((dataType, name, payload))
 
     def _handle_events(self):
-        while True:
+        while self.isrunning.is_set():
             type_, payload = self._eventqueue.get()
+            if type_ == -1:
+                break
             self._handle_event(type_, payload)
 
     def _handle_event(self, type_, payload):
