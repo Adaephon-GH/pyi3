@@ -63,6 +63,8 @@ class Socket:
         isEvent = type_ >> 31
         typeName = (eventTypes[type_ & 0x7f] if isEvent
                     else msgTypes[type_])
+        # maybe use data.decode(errors=ignore) -> faulty jetbrains class name
+        # see http://bugs.i3wm.org/report/ticket/1347
         parsedData = json.loads(data.decode())
         response = ('event' if isEvent else 'reply',
                     typeName,
