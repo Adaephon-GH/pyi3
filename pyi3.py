@@ -72,19 +72,25 @@ class Socket:
         return response
 
     def __getattr__(self, attr):
+        # provide method for every msgType
         if attr in msgTypes:
             def func(msg=b''):
                 self._send(msgTypesMap[attr], msg)
-                return self._receive()
+                return self.receive()
             return func
         else:
             raise AttributeError("'{}' object has no attribute '{}'".format(
                 self.__class__.__name__, attr))
 
 
-class EventHandler:
+class I3Base:
     def __init__(self, socket=None):
         self.socket = socket or Socket()
+
+
+class EventHandler(I3Base):
+    def __init__(self, socket=None):
+        super().__init__(socket)
         self.events = [0] * len(eventTypes)
         self._eventqueue = queue.Queue()
         self._subscript_confirmation = queue.Queue()
@@ -128,3 +134,17 @@ class Hook:
 
 class UnexpectedDataError(Exception):
     pass
+
+
+class WorkspaceHandler(I3Base):
+    def __init__(self, socket=None):
+        super().__init__(socket)
+
+    def workspaces(self, outputs=None):
+        _, _, wslist = self.socket.get_workspaces()
+        return wslist
+
+
+
+
+
