@@ -74,13 +74,17 @@ class Socket:
     def __getattr__(self, attr):
         # provide method for every msgType
         if attr in msgTypes:
-            def func(msg=b''):
-                self._send(msgTypesMap[attr], msg)
-                return self.receive()
-            return func
+            msgType = attr
         else:
-            raise AttributeError("'{}' object has no attribute '{}'".format(
-                self.__class__.__name__, attr))
+            msgType = msgTypesMap['command']
+
+        def func(msg=b''):
+            self._send(msgType, b"%b %b" % (attr.encode(), msg))
+            return self.receive()
+        # else:
+        #     raise AttributeError("'{}' object has no attribute '{}'".format(
+        #         self.__class__.__name__, attr))
+        return func
 
 
 class I3Base:
