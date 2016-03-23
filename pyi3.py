@@ -135,14 +135,24 @@ class Hook:
 class UnexpectedDataError(Exception):
     pass
 
+class Item:
+    def __init__(self, dict):
+        self.__dict__.update(dict)
+
 
 class WorkspaceHandler(I3Base):
     def __init__(self, socket=None):
         super().__init__(socket)
 
-    def workspaces(self, outputs=None):
+    @property
+    def _workspaces(self):
         _, _, wslist = self.socket.get_workspaces()
-        return wslist
+        return map(lambda ws: Item(ws), wslist)
+
+    def workspaces(self, visible=None, focused=None, urgent=None,
+                   num=None):
+        pass
+
 
 
 
