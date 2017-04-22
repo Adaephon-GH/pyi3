@@ -1,14 +1,13 @@
 #!/usr/bin/env python3
 import threading
-
-
-__author__ = 'Adaephon'
-
 import json
 import queue
 import socket
 import struct
 import subprocess
+
+
+__author__ = 'Adaephon'
 
 msgTypes = [
     'command',
@@ -88,13 +87,13 @@ class Socket:
 
 
 class I3Base:
-    def __init__(self, socket=None):
-        self.socket = socket or Socket()
+    def __init__(self, i3socket=None):
+        self.socket = i3socket or Socket()
 
 
 class EventHandler(I3Base):
-    def __init__(self, socket=None):
-        super().__init__(socket)
+    def __init__(self, i3socket=None):
+        super().__init__(i3socket)
         self.events = [0] * len(eventTypes)
         self._eventqueue = queue.Queue()
         self._subscript_confirmation = queue.Queue()
@@ -139,14 +138,15 @@ class Hook:
 class UnexpectedDataError(Exception):
     pass
 
+
 class Item:
-    def __init__(self, dict):
-        self.__dict__.update(dict)
+    def __init__(self, items):
+        self.__dict__.update(items)
 
 
 class WorkspaceHandler(I3Base):
-    def __init__(self, socket=None):
-        super().__init__(socket)
+    def __init__(self, i3socket=None):
+        super().__init__(i3socket)
 
     @property
     def _workspaces(self):
@@ -156,9 +156,3 @@ class WorkspaceHandler(I3Base):
     def workspaces(self, visible=None, focused=None, urgent=None,
                    num=None):
         pass
-
-
-
-
-
-
