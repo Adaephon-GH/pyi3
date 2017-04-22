@@ -71,18 +71,23 @@ class Socket:
         return response
 
     def __getattr__(self, attr):
-        # provide method for every msgType
+        """
+        Provides direct access to all i3 message types and commands
+
+        :param attr: name of the message type or command
+        :return: a function that sends the message and returns the response
+        """
+        print(type(attr))
         if attr in msgTypes:
-            msgType = attr
+            msgType = msgTypesMap[attr]
+            prefix = b""
         else:
             msgType = msgTypesMap['command']
+            prefix = attr.encode() + b" "
 
         def func(msg=b''):
-            self._send(msgType, b"%b %b" % (attr.encode(), msg))
+            self._send(msgType, prefix + msg)
             return self.receive()
-        # else:
-        #     raise AttributeError("'{}' object has no attribute '{}'".format(
-        #         self.__class__.__name__, attr))
         return func
 
 
