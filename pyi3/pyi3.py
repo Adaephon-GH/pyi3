@@ -18,6 +18,7 @@ msgTypes = [
     'get_marks',
     'get_bar_config',
     'get_version',
+    'get_binding_modes',
 ]
 msgTypesMap = {msgTypes[i]: i for i in range(len(msgTypes))}
 
