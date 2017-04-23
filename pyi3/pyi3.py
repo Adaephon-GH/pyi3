@@ -78,8 +78,10 @@ class Socket:
         :param attr: name of the message type or command
         :return: a function that sends the message and returns the response
         """
-        print(type(attr))
-        if attr in msgTypes:
+        # Testing beforehand instead of catching an exception may seem
+        # un-Pythonic but it is overall faster if the exception would be
+        # raised quite often.
+        if attr in msgTypesMap:
             msgType = msgTypesMap[attr]
             prefix = b""
         else:
